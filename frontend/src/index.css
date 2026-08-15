@@ -1,0 +1,39 @@
+@import '@mantine/core/styles.css';
+@import '@mantine/notifications/styles.css';
+
+:root {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0f172a;
+  color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Custom background mesh effect */
+.app-container {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 50%),
+              radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.1), transparent 40%);
+}
+
+.glass-card {
+  background: rgba(30, 41, 59, 0.7) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.user-row {
+  transition: all 0.2s ease;
+}
+
+.user-row:hover {
+  background-color: rgba(51, 65, 85, 0.4) !important;
+}

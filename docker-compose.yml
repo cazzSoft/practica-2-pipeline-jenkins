@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:17
+    container_name: practica_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-practica_db}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5434}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-practica_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  backend:
+    image: cazzsoft/gestion-usuarios-backend:practica1
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: practica_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-change_me}@db:5432/${POSTGRES_DB:-practica_db}?schema=public
+      PORT: 3000
+      HOST: 0.0.0.0
+    ports:
+      - "${BACKEND_HOST_PORT:-3001}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+  frontend:
+    image: cazzsoft/gestion-usuarios-frontend:practica1
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: practica_frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+    ports:
+      - "${FRONTEND_HOST_PORT:-5173}:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
