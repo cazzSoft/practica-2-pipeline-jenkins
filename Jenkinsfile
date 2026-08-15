@@ -16,7 +16,7 @@ pipeline {
     parameters {
         booleanParam(
             name: 'PUBLICAR_IMAGENES',
-            defaultValue: false,
+            defaultValue: true,
             description: 'Publicar imagenes en Docker Hub y redesplegar Railway'
         )
     }
