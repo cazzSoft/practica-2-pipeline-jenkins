@@ -1,0 +1,20 @@
+services:
+  jenkins:
+    image: cazzsoft/jenkins-node-docker:lts-jdk21
+    build:
+      context: ./jenkins-fixed
+      dockerfile: Dockerfile
+    container_name: jenkins-lab
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    group_add:
+      - "0"
+
+volumes:
+  jenkins_home:
+    external: true
