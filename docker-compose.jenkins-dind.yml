@@ -1,0 +1,45 @@
+services:
+  docker:
+    image: docker:dind
+    container_name: jenkins-docker
+    restart: unless-stopped
+    privileged: true
+    command: --storage-driver overlay2
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+    volumes:
+      - jenkins-docker-certs:/certs/client
+      - jenkins_home:/var/jenkins_home
+    networks:
+      jenkins:
+        aliases:
+          - docker
+
+  jenkins:
+    image: cazzsoft/jenkins-node-docker:lts-jdk21
+    container_name: jenkins-lab
+    restart: unless-stopped
+    depends_on:
+      - docker
+    environment:
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_TLS_VERIFY: "1"
+    ports:
+      - "127.0.0.1:8082:8080"
+      - "127.0.0.1:50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+    networks:
+      - jenkins
+
+networks:
+  jenkins:
+    name: jenkins
+
+volumes:
+  jenkins_home:
+    external: true
+  jenkins-docker-certs:
+    external: true
