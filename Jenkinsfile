@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        pollSCM('H/2 * * * *')
+        pollSCM('  * * * * *')
     }
 
     options {
@@ -127,13 +127,23 @@ EOF
 
         stage('Docker - Validacion') {
             steps {
-                sh 'docker compose config --quiet'
+                sh '''
+                    set -eu
+                    test -f backend/Dockerfile
+                    test -f frontend/Dockerfile
+                    docker version
+                    echo 'Dockerfiles y cliente Docker validados.'
+                '''
             }
         }
 
         stage('Docker - Construccion') {
             steps {
-                sh 'docker compose build --no-cache'
+                sh '''
+                    set -eu
+                    docker build --pull --no-cache -t "$LOCAL_BACKEND_IMAGE" ./backend
+                    docker build --pull --no-cache -t "$LOCAL_FRONTEND_IMAGE" ./frontend
+                '''
             }
         }
 
